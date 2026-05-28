@@ -1,0 +1,85 @@
+package org.example.classroompb.model;
+
+import java.io.Serializable;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Turma implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String codigo;
+    private Disciplina disciplina;
+    private Professor professor;
+    private PeriodoLetivo periodoLetivo;
+    private int limiteVagas;
+    private int vagasDisponiveis;
+    private String horario; // Formato: "HH:mm-HH:mm" (ex: "08:00-10:00")
+    private String sala;
+    private List<String> alunoMatriculados; // Lista de matrículas de alunos
+
+    public Turma(String codigo, Disciplina disciplina, Professor professor, 
+                 PeriodoLetivo periodoLetivo, int limiteVagas, String horario, String sala) {
+        this.codigo = codigo;
+        this.disciplina = disciplina;
+        this.professor = professor;
+        this.periodoLetivo = periodoLetivo;
+        this.limiteVagas = limiteVagas;
+        this.vagasDisponiveis = limiteVagas;
+        this.horario = horario;
+        this.sala = sala;
+        this.alunoMatriculados = new ArrayList<>();
+    }
+
+    // Getters
+    public String getCodigo() { return codigo; }
+    public Disciplina getDisciplina() { return disciplina; }
+    public Professor getProfessor() { return professor; }
+    public PeriodoLetivo getPeriodoLetivo() { return periodoLetivo; }
+    public int getLimiteVagas() { return limiteVagas; }
+    public int getVagasDisponiveis() { return vagasDisponiveis; }
+    public String getHorario() { return horario; }
+    public String getSala() { return sala; }
+    public List<String> getAlunoMatriculados() { return new ArrayList<>(alunoMatriculados); }
+    public int getTotalMatriculados() { return alunoMatriculados.size(); }
+
+    // Métodos de negócio
+    public boolean temVagasDisponiveis() {
+        return vagasDisponiveis > 0;
+    }
+
+    public boolean alunoJaMatriculado(String matriculaAluno) {
+        return alunoMatriculados.contains(matriculaAluno);
+    }
+
+    public void matricularAluno(String matriculaAluno) {
+        if (!temVagasDisponiveis()) {
+            throw new IllegalArgumentException("Turma sem vagas disponíveis.");
+        }
+        if (alunoJaMatriculado(matriculaAluno)) {
+            throw new IllegalArgumentException("Aluno já matriculado nesta turma. (RN01)");
+        }
+        alunoMatriculados.add(matriculaAluno);
+        vagasDisponiveis--;
+    }
+
+    public void cancelarMatricula(String matriculaAluno) {
+        if (alunoMatriculados.remove(matriculaAluno)) {
+            vagasDisponiveis++;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Turma{" +
+                "codigo='" + codigo + '\'' +
+                ", disciplina=" + disciplina.getNome() +
+                ", professor=" + professor.getNome() +
+                ", horario='" + horario + '\'' +
+                ", sala='" + sala + '\'' +
+                ", vagas=" + vagasDisponiveis + "/" + limiteVagas +
+                '}';
+    }
+}
+
